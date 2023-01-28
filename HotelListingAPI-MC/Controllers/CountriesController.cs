@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HotelListingAPI_DATA;
 using HotelListingAPI_DATA.Entities;
+using HotelListingAPI_MC.Models.Country;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -79,12 +80,17 @@ namespace HotelListingAPI_MC.Controllers
         // POST: api/Countries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CountryEntity>> PostCountryEntity(CountryEntity countryEntity)
+        public async Task<ActionResult<CountryEntity>> PostCountryEntity(CreateCountryDto createCountry)
         {
-            _context.Countries.Add(countryEntity);
+            var country = new CountryEntity
+            {
+                Name = createCountry.Name,
+                ShortName = createCountry.ShortName
+            };
+            _context.Countries.Add(country);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCountryEntity", new { id = countryEntity.CountryId }, countryEntity);
+            return CreatedAtAction("GetCountryEntity", new { id = country.CountryId }, createCountry);
         }
 
         // DELETE: api/Countries/5
