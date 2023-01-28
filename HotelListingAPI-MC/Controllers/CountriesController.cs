@@ -21,12 +21,15 @@ namespace HotelListingAPI_MC.Controllers
             _context = context;
         }
 
+        
         // GET: api/Countries
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryEntity>>> GetCountries()
         {
             return await _context.Countries.ToListAsync();
+
         }
+
 
         // GET: api/Countries/5
         [HttpGet("{id}")]

@@ -11,7 +11,7 @@ namespace HotelListingAPI_DATA.Entities
 
         public string ShortName { get; set; }
 
-        public IList<HotelEntity> Hotels { get; set; }
+        public List<HotelEntity> Hotels { get; set; }
     }
 
     public class CountryEntityConfiguration : IEntityTypeConfiguration<CountryEntity>
