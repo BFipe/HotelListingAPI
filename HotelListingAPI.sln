@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelListingAPI-MC", "HotelListingAPI-MC\HotelListingAPI-MC.csproj", "{B1BD02BA-3EDD-42F6-9FAC-31DC3CC9D1CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotelListingAPI-DATA", "HotelListingAPI-DATA\HotelListingAPI-DATA.csproj", "{FBB895BB-C961-49B2-AA0B-692238E19191}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1BD02BA-3EDD-42F6-9FAC-31DC3CC9D1CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1BD02BA-3EDD-42F6-9FAC-31DC3CC9D1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1BD02BA-3EDD-42F6-9FAC-31DC3CC9D1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1BD02BA-3EDD-42F6-9FAC-31DC3CC9D1CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBB895BB-C961-49B2-AA0B-692238E19191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBB895BB-C961-49B2-AA0B-692238E19191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBB895BB-C961-49B2-AA0B-692238E19191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBB895BB-C961-49B2-AA0B-692238E19191}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6BF092D-06F8-4568-8771-B5DD17FC0F04}
+	EndGlobalSection
+EndGlobal
