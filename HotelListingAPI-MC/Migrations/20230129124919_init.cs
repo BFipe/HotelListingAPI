@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace HotelListingAPI_DATA.Migrations
+namespace HotelListingAPI_MC.Migrations
 {
     public partial class init : Migration
     {

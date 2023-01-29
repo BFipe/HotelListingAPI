@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HotelListingAPI_DATA.Migrations
+namespace HotelListingAPI_MC.Migrations
 {
     [DbContext(typeof(HotelListingDbContext))]
-    [Migration("20230128100934_init")]
+    [Migration("20230129124919_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

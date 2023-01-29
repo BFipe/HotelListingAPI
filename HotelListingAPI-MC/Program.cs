@@ -1,5 +1,7 @@
 using HotelListingAPI_DATA;
 using HotelListingAPI_MC.Configurations;
+using HotelListingAPI_MC.Contracts;
+using HotelListingAPI_MC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -39,6 +41,9 @@ namespace HotelListingAPI
             });
 
             builder.Services.AddAutoMapper(typeof(MapperConfig));
+
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<ICountryRepository, CountryRepository>();
 
             var app = builder.Build();
 
