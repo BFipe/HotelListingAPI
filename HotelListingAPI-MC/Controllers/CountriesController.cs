@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HotelListingAPI_DATA;
 using HotelListingAPI_DATA.Entities;
 using HotelListingAPI_MC.Models.Country;
+using AutoMapper;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -16,47 +17,60 @@ namespace HotelListingAPI_MC.Controllers
     public class CountriesController : ControllerBase
     {
         private readonly HotelListingDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CountriesController(HotelListingDbContext context)
+        public CountriesController(HotelListingDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        
+
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryEntity>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
-            return await _context.Countries.ToListAsync();
-
+            var countries = await _context.Countries.ToListAsync();
+            var dtoCountries = _mapper.Map<IEnumerable<GetCountryDto>>(countries);
+            return Ok(dtoCountries);
         }
 
 
         // GET: api/Countries/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CountryEntity>> GetCountryEntity(int id)
+        public async Task<ActionResult<CountryDto>> GetCountryEntity(int id)
         {
-            var countryEntity = await _context.Countries.FindAsync(id);
+            var countryEntity = await _context.Countries
+                .Include(q => q.Hotels)
+                .SingleOrDefaultAsync(q => q.CountryId == id);
 
             if (countryEntity == null)
             {
                 return NotFound();
             }
 
-            return countryEntity;
+            var countryDto = _mapper.Map<CountryDto>(countryEntity);
+
+            return Ok(countryDto);
         }
 
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountryEntity(int id, CountryEntity countryEntity)
+        public async Task<IActionResult> PutCountryEntity(int id, UpdateCountryDto updateCountryDto)
         {
-            if (id != countryEntity.CountryId)
+            if (id != updateCountryDto.CountryId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(countryEntity).State = EntityState.Modified;
+            var countryEntity = await _context.Countries.FindAsync(id);
+            if (countryEntity == null)
+            {
+                return NotFound();
+            }
+
+            _mapper.Map(updateCountryDto, countryEntity);      
 
             try
             {
@@ -80,13 +94,10 @@ namespace HotelListingAPI_MC.Controllers
         // POST: api/Countries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CountryEntity>> PostCountryEntity(CreateCountryDto createCountry)
+        public async Task<ActionResult<CreateCountryDto>> PostCountryEntity(CreateCountryDto createCountry)
         {
-            var country = new CountryEntity
-            {
-                Name = createCountry.Name,
-                ShortName = createCountry.ShortName
-            };
+            var country = _mapper.Map<CountryEntity>(createCountry);
+
             _context.Countries.Add(country);
             await _context.SaveChangesAsync();
 

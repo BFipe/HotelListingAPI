@@ -1,4 +1,5 @@
 using HotelListingAPI_DATA;
+using HotelListingAPI_MC.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -36,6 +37,8 @@ namespace HotelListingAPI
             {
                 lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration);
             });
+
+            builder.Services.AddAutoMapper(typeof(MapperConfig));
 
             var app = builder.Build();
 
