@@ -95,7 +95,7 @@ namespace HotelListingAPI_MC.Controllers
 
             if (await _hotelRepository.IsCountryExist(createHotelDto.CountryId) == false)
             {
-                return NotFound($"Country id {createHotelDto.CountryId} not found");
+                return NotFound();
             }
 
             await _hotelRepository.AddAsync(hotelEntity);
