@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using HotelListingAPI_DATA;
 using HotelListingAPI_DATA.Entities;
 using HotelListingAPI_MC.Contracts;
+using AutoMapper;
+using HotelListingAPI_MC.Models.Hotel;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -16,22 +18,28 @@ namespace HotelListingAPI_MC.Controllers
     public class HotelsController : ControllerBase
     {
         private readonly IHotelRepository _hotelRepository;
+        private readonly IMapper _mapper;
 
-        public HotelsController(IHotelRepository hotelRepository)
+        public HotelsController(IHotelRepository hotelRepository, IMapper mapper)
         {
             _hotelRepository = hotelRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Hotels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<HotelEntity>>> GetHotels()
+        public async Task<ActionResult<IEnumerable<GetHotelDto>>> GetHotels()
         {
-            return await _hotelRepository.GetAllAsync();
+            var hotels = await _hotelRepository.GetAllAsync();
+
+            var hotelsDto = _mapper.Map<List<GetHotelDto>>(hotels);
+
+            return Ok(hotelsDto);
         }
 
         // GET: api/Hotels/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<HotelEntity>> GetHotelEntity(int id)
+        public async Task<ActionResult<HotelDto>> GetHotelEntity(int id)
         {
             var hotelEntity = await _hotelRepository.GetAsync(id);
 
@@ -40,24 +48,27 @@ namespace HotelListingAPI_MC.Controllers
                 return NotFound();
             }
 
-            return hotelEntity;
+            var hotelDto = _mapper.Map<HotelDto>(hotelEntity);
+
+            return Ok(hotelDto);
         }
 
         // PUT: api/Hotels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutHotelEntity(int id, HotelEntity hotelEntity)
+        public async Task<IActionResult> PutHotelEntity(int id, UpdateHotelDto updateHotelDto)
         {
-            if (id != hotelEntity.HotelEntityId)
+            if (id != updateHotelDto.HotelEntityId)
             {
                 return BadRequest();
             }
 
-            
+            var hotelEntity = await _hotelRepository.GetAsync(id);
+
+            _mapper.Map(updateHotelDto, hotelEntity);
 
             try
             {
-                await _hotelRepository.UpdateAsync(hotelEntity);
                 await _hotelRepository.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -78,12 +89,19 @@ namespace HotelListingAPI_MC.Controllers
         // POST: api/Hotels
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<HotelEntity>> PostHotelEntity(HotelEntity hotelEntity)
+        public async Task<ActionResult<HotelEntity>> PostHotelEntity(CreateHotelDto createHotelDto)
         {
+            var hotelEntity = _mapper.Map<HotelEntity>(createHotelDto);
+
+            if (await _hotelRepository.IsCountryExist(createHotelDto.CountryId) == false)
+            {
+                return NotFound($"Country id {createHotelDto.CountryId} not found");
+            }
+
             await _hotelRepository.AddAsync(hotelEntity);
             await _hotelRepository.SaveChangesAsync();
 
-            return CreatedAtAction("GetHotelEntity", new { id = hotelEntity.HotelEntityId }, hotelEntity);
+            return CreatedAtAction("GetHotelEntity", new { id = hotelEntity.HotelEntityId }, createHotelDto);
         }
 
         // DELETE: api/Hotels/5

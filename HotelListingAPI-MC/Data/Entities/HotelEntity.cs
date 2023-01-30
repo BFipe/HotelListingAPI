@@ -16,7 +16,7 @@ namespace HotelListingAPI_DATA.Entities
 
         public string Address { get; set; }
 
-        public double Rating { get; set; }
+        public double? Rating { get; set; }
 
 
         public int CountryId { get; set; }
@@ -29,6 +29,8 @@ namespace HotelListingAPI_DATA.Entities
         {
             builder.HasKey(q => q.HotelEntityId);
             builder.Property(q => q.HotelEntityId).ValueGeneratedOnAdd();
+
+            builder.Property(q => q.Rating).IsRequired(false);
         }
     }
 }

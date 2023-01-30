@@ -16,5 +16,10 @@ namespace HotelListingAPI_MC.Repositories
         {
             return await _dbContext.Hotels.Include(q => q.Country).SingleOrDefaultAsync(q => q.HotelEntityId == id);
         }
+
+        public async Task<bool> IsCountryExist(int id)
+        {
+            return await _dbContext.Countries.SingleOrDefaultAsync(q => q.CountryId == id) is not null;
+        }
     }
 }
