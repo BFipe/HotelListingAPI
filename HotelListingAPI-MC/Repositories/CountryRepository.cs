@@ -12,9 +12,9 @@ namespace HotelListingAPI_MC.Repositories
             
         }
 
-        public override Task<CountryEntity> GetAsync(int id)
+        public override async Task<CountryEntity> GetAsync(int id)
         {
-            return _dbContext.Countries.Include(q => q.Hotels).SingleOrDefaultAsync(q => q.CountryId == id);
+            return await _dbContext.Countries.Include(q => q.Hotels).SingleOrDefaultAsync(q => q.CountryId == id);
         }
     }
 }

@@ -112,8 +112,8 @@ namespace HotelListingAPI_MC.Controllers
             {
                 return NotFound();
             }
-
             await _countryRepository.DeleteAsync(id);
+
             await _countryRepository.SaveChangesAsync();
 
             return NoContent();
