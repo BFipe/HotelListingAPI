@@ -6,20 +6,20 @@ namespace HotelListingAPI_MC.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly HotelListingDbContext _dbContext;
+        private protected readonly HotelListingDbContext _dbContext;
 
         public GenericRepository(HotelListingDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<T> AddAsync(T entity)
+        public virtual async Task<T> AddAsync(T entity)
         {
             await _dbContext.AddAsync(entity);
             return entity;
         }
 
-        public async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id)
         {
             var entity = await GetAsync(id);
             var task = new Task(() => _dbContext.Set<T>().Remove(entity));
@@ -27,30 +27,30 @@ namespace HotelListingAPI_MC.Repositories
             await task;
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public virtual async Task<List<T>> GetAllAsync()
         {
             return await _dbContext.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetAsync(int id)
+        public virtual async Task<T> GetAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }
 
-        public async Task<bool> IsExists(int id)
+        public virtual async Task<bool> IsExists(int id)
         {
             return await GetAsync(id) is not null;
         }
 
 
-        public async Task UpdateAsync(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
             var task = new Task(() => _dbContext.Update(entity));
             task.Start();
             await task;
         }
 
-        public async Task SaveChangesAsync()
+        public virtual async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
         }
