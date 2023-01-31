@@ -29,10 +29,10 @@ namespace HotelListingAPI_MC.Controllers
 
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<CountryDto>>> GetCountries()
         {
             var countries = await _countryRepository.GetAllAsync();
-            var dtoCountries = _mapper.Map<IEnumerable<GetCountryDto>>(countries);
+            var dtoCountries = _mapper.Map<IEnumerable<CountryDto>>(countries);
             return Ok(dtoCountries);
         }
 

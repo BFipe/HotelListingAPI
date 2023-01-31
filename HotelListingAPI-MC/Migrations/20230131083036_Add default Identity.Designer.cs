@@ -4,6 +4,7 @@ using HotelListingAPI_DATA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelListingAPI_MC.Migrations
 {
     [DbContext(typeof(HotelListingDbContext))]
-    partial class HotelListingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230131083036_Add default Identity")]
+    partial class AdddefaultIdentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,26 +172,6 @@ namespace HotelListingAPI_MC.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "2164cbdd-1724-4106-b165-595a318dea8e",
-                            ConcurrencyStamp = "2a46ee1d-0f9a-41fc-af8d-ae6e244ddc1b",
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = "93e32a81-051a-415b-b368-de08449d6e0f",
-                            ConcurrencyStamp = "891c684d-9c4d-48dc-9c09-8113a1124844",
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = "e27315a0-2ae6-416e-a607-203fe18d705c",
-                            ConcurrencyStamp = "dd1c4153-0c20-4c98-b4cd-8994c73a867c",
-                            Name = "User"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

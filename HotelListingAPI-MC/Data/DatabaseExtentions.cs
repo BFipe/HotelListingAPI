@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HotelListingAPI_MC.Data;
+using HotelListingAPI_MC.Data.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -16,9 +19,13 @@ namespace HotelListingAPI_DATA
             {
                 options.UseSqlServer(connectionString, q => q.MigrationsAssembly("HotelListingAPI-MC"));
             });
-           
+
+            services
+                .AddIdentityCore<APIUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<HotelListingDbContext>();
+
             return services;
         }
-
     }
 }
