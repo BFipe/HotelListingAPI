@@ -22,7 +22,11 @@ namespace HotelListingAPI_MC.Repositories
         public virtual async Task DeleteAsync(int id)
         {
             var entity = await GetAsync(id);
-            var task = new Task(() => _dbContext.Set<T>().Remove(entity));
+            var task = new Task(() =>
+            {
+                var removeEntity = entity;
+                _dbContext.Set<T>().Remove(removeEntity);
+            });
             task.Start();
             await task;
         }
@@ -45,7 +49,11 @@ namespace HotelListingAPI_MC.Repositories
 
         public virtual async Task UpdateAsync(T entity)
         {
-            var task = new Task(() => _dbContext.Update(entity));
+            var task = new Task(() =>
+            {
+                var updateEntity = entity;
+                _dbContext.Update(updateEntity);
+            });
             task.Start();
             await task;
         }
