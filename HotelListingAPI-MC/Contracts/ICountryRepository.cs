@@ -1,4 +1,4 @@
-﻿using HotelListingAPI_DATA.Entities;
+﻿using HotelListingAPI_MC.Data.Entities.CountryEntities;
 
 namespace HotelListingAPI_MC.Contracts
 {

@@ -1,6 +1,6 @@
 ﻿using HotelListingAPI_DATA;
-using HotelListingAPI_DATA.Entities;
 using HotelListingAPI_MC.Contracts;
+using HotelListingAPI_MC.Data.Entities.CountryEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListingAPI_MC.Repositories

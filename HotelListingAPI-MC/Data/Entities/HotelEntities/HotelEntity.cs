@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HotelListingAPI_MC.Data.Entities.CountryEntities;
 
-namespace HotelListingAPI_DATA.Entities
+namespace HotelListingAPI_MC.Data.Entities.HotelEntities
 {
     public class HotelEntity
     {

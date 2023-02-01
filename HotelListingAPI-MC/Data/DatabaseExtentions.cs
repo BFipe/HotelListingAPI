@@ -1,5 +1,5 @@
 ﻿using HotelListingAPI_MC.Data;
-using HotelListingAPI_MC.Data.Entities;
+using HotelListingAPI_MC.Data.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,10 @@ namespace HotelListingAPI_DATA
             });
 
             services
-                .AddIdentityCore<APIUser>()
+                .AddIdentityCore<APIUser>(options => 
+                {
+                    options.Password.RequireNonAlphanumeric = false;
+                })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<HotelListingDbContext>();
 

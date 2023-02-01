@@ -1,5 +1,7 @@
-﻿using HotelListingAPI_DATA.Entities;
-using HotelListingAPI_MC.Data.Entities;
+﻿using HotelListingAPI_MC.Data.Entities;
+using HotelListingAPI_MC.Data.Entities.CountryEntities;
+using HotelListingAPI_MC.Data.Entities.HotelEntities;
+using HotelListingAPI_MC.Data.Entities.UserEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;

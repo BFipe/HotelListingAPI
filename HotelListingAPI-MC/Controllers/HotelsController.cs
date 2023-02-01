@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HotelListingAPI_DATA;
-using HotelListingAPI_DATA.Entities;
 using HotelListingAPI_MC.Contracts;
 using AutoMapper;
 using HotelListingAPI_MC.Models.Hotel;
+using HotelListingAPI_MC.Data.Entities.HotelEntities;
 
 namespace HotelListingAPI_MC.Controllers
 {

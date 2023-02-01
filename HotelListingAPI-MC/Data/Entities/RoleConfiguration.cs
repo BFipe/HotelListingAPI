@@ -9,9 +9,21 @@ namespace HotelListingAPI_MC.Data.Entities
         public void Configure(EntityTypeBuilder<IdentityRole> builder)
         {
             builder.HasData(
-                new IdentityRole("Admin"),
-                new IdentityRole("Manager"),
-                new IdentityRole("User")
+                new IdentityRole()
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                 new IdentityRole()
+                 {
+                     Name = "Manager",
+                     NormalizedName = "MANAGER"
+                 },
+                 new IdentityRole()
+                 {
+                     Name = "User",
+                     NormalizedName = "USER"
+                 }
                 );
         }
     }
