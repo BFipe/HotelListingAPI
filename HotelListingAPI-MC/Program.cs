@@ -24,7 +24,7 @@ namespace HotelListingAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var connectionString = builder.Configuration.GetConnectionString("HotelListingDbConnectionString");
+            var connectionString = builder.Configuration["HotelListingDbConnectionString"];
             builder.Services.AddDatabase(connectionString);
 
             //Configuring cors
@@ -66,7 +66,7 @@ namespace HotelListingAPI
                     ClockSkew = TimeSpan.Zero,
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"]))
                     
                 };
             });
