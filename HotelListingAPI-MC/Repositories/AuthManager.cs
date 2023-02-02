@@ -15,64 +15,89 @@ namespace HotelListingAPI_MC.Repositories
         private readonly IMapper _mapper;
         private readonly UserManager<APIUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthManager> _logger;
         private APIUser _user;
 
         private const string _loginProvider = "HotelListingAPI-MC";
         private const string _refreshToken = "RefreshToken";
 
 
-        public AuthManager(IMapper mapper, UserManager<APIUser> userManager, IConfiguration configuration)
+        public AuthManager(IMapper mapper, UserManager<APIUser> userManager, IConfiguration configuration, ILogger<AuthManager> logger)
         {
             _mapper = mapper;
             _userManager = userManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<string> CreateRefreshToken()
         {
-            await _userManager.RemoveAuthenticationTokenAsync(_user, _loginProvider, _refreshToken);
-            var newRefreshToken = await _userManager.GenerateUserTokenAsync(_user, _loginProvider, _refreshToken);
-            var result = await _userManager.SetAuthenticationTokenAsync(_user, _loginProvider, _refreshToken, newRefreshToken);
-            if (result.Succeeded)
+            try
             {
-                return newRefreshToken;
+                await _userManager.RemoveAuthenticationTokenAsync(_user, _loginProvider, _refreshToken);
+                var newRefreshToken = await _userManager.GenerateUserTokenAsync(_user, _loginProvider, _refreshToken);
+                var result = await _userManager.SetAuthenticationTokenAsync(_user, _loginProvider, _refreshToken, newRefreshToken);
+                if (result.Succeeded)
+                {
+                    return newRefreshToken;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                if (_user == null)
+                {
+                    _logger.LogError(ex, $"Something went wrong in the {nameof(CreateRefreshToken)} while trying to create refresh token for null user");
+                }
+                else
+                {
+                    _logger.LogError(ex, $"Something went wrong in the {nameof(CreateRefreshToken)} while trying to create refresh token for user {_user.Email}");
+                }
+                throw;
             }
 
         }
 
         public async Task<AuthResponceDto> VerifyRefreshToken(AuthResponceDto request)
         {
-            var jwtSequrityTokenHandler = new JwtSecurityTokenHandler();
-            var tokenContent = jwtSequrityTokenHandler.ReadJwtToken(request.Token);
-            var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
-            _user = await _userManager.FindByNameAsync(username);
-            if (_user is null || _user.Email != request.UserEmail)
+            try
             {
+                var jwtSequrityTokenHandler = new JwtSecurityTokenHandler();
+                var tokenContent = jwtSequrityTokenHandler.ReadJwtToken(request.Token);
+                var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                _user = await _userManager.FindByNameAsync(username);
+                if (_user is null || _user.Email != request.UserEmail)
+                {
+                    return null;
+                }
+
+                var isValidRefreshToken = await _userManager.VerifyUserTokenAsync(_user, _loginProvider, _refreshToken, request.RefreshToken);
+                if (isValidRefreshToken)
+                {
+                    var refreshToken = await CreateRefreshToken();
+                    if (refreshToken is not null)
+                    {
+                        var token = await GenerateToken();
+                        return new AuthResponceDto
+                        {
+                            Token = token,
+                            UserEmail = _user.Email,
+                            RefreshToken = refreshToken,
+                        };
+                    }
+                }
+
+                await _userManager.UpdateSecurityStampAsync(_user);
                 return null;
             }
-
-            var isValidRefreshToken = await _userManager.VerifyUserTokenAsync(_user, _loginProvider, _refreshToken, request.RefreshToken);
-            if (isValidRefreshToken)
+            catch (Exception ex)
             {
-                var refreshToken = await CreateRefreshToken();
-                if (refreshToken is not null)
-                {
-                    var token = await GenerateToken();
-                    return new AuthResponceDto
-                    {
-                        Token = token,
-                        UserEmail = _user.Email,
-                        RefreshToken = refreshToken,
-                    };
-                }
+                _logger.LogError(ex, $"Something went wrong in the {nameof(CreateRefreshToken)} while trying to verify refresh token for user {_user.Email}");
+                throw;
             }
-
-            await _userManager.UpdateSecurityStampAsync(_user);
-            return null;
         }
 
         public async Task<AuthResponceDto> Login(LoginUserDto loginUserDto)
