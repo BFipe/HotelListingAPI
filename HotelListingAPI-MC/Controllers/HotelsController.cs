@@ -10,6 +10,7 @@ using HotelListingAPI_MC.Contracts;
 using AutoMapper;
 using HotelListingAPI_MC.Models.Hotel;
 using HotelListingAPI_MC.Data.Entities.HotelEntities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -56,6 +57,7 @@ namespace HotelListingAPI_MC.Controllers
         // PUT: api/Hotels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> PutHotelEntity(int id, UpdateHotelDto updateHotelDto)
         {
             if (id != updateHotelDto.HotelEntityId)
@@ -89,6 +91,7 @@ namespace HotelListingAPI_MC.Controllers
         // POST: api/Hotels
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<ActionResult<HotelEntity>> PostHotelEntity(CreateHotelDto createHotelDto)
         {
             var hotelEntity = _mapper.Map<HotelEntity>(createHotelDto);
@@ -106,6 +109,7 @@ namespace HotelListingAPI_MC.Controllers
 
         // DELETE: api/Hotels/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteHotelEntity(int id)
         {
             var hotelEntity = await _hotelRepository.GetAsync(id);

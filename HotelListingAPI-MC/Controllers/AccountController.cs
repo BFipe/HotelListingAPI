@@ -1,5 +1,6 @@
 ﻿using HotelListingAPI_MC.Contracts;
 using HotelListingAPI_MC.Models.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace HotelListingAPI_MC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous]
     public class AccountController : ControllerBase
     {
         private readonly IAuthManager _authManager;
@@ -48,13 +50,13 @@ namespace HotelListingAPI_MC.Controllers
         public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
         {
             var result = await _authManager.Login(loginUserDto);
-            if (result == false )
+            if (result is null)
             {
                 return Unauthorized();
             }
             else
             {
-                return Ok();
+                return Ok(result);
             }
         }
     }

@@ -80,15 +80,17 @@ namespace HotelListingAPI
                 app.UseSwaggerUI();
             }
 
+
             //Added serilog logging with settings in appsettings.json
             app.UseSerilogRequestLogging();
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-
             //Applying cors
             app.UseCors("AllowAll");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

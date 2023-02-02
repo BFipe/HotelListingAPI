@@ -10,11 +10,13 @@ using HotelListingAPI_MC.Models.Country;
 using AutoMapper;
 using HotelListingAPI_MC.Contracts;
 using HotelListingAPI_MC.Data.Entities.CountryEntities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListingAPI_MC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class CountriesController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -56,6 +58,7 @@ namespace HotelListingAPI_MC.Controllers
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles ="Manager, Admin")]
         public async Task<IActionResult> PutCountryEntity(int id, UpdateCountryDto updateCountryDto)
         {
             if (id != updateCountryDto.CountryId)
@@ -93,6 +96,7 @@ namespace HotelListingAPI_MC.Controllers
         // POST: api/Countries
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<ActionResult<CreateCountryDto>> PostCountryEntity(CreateCountryDto createCountry)
         {
             var country = _mapper.Map<CountryEntity>(createCountry);
@@ -105,6 +109,7 @@ namespace HotelListingAPI_MC.Controllers
 
         // DELETE: api/Countries/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteCountryEntity(int id)
         {
             var countryEntity = await _countryRepository.GetAsync(id);
