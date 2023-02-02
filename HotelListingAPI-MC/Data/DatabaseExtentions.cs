@@ -26,7 +26,9 @@ namespace HotelListingAPI_DATA
                     options.Password.RequireNonAlphanumeric = false;
                 })
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<HotelListingDbContext>();
+                .AddTokenProvider<DataProtectorTokenProvider<APIUser>>("HotelListingAPI-MC")
+                .AddEntityFrameworkStores<HotelListingDbContext>()
+                .AddDefaultTokenProviders();
 
             return services;
         }
