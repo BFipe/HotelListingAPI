@@ -34,11 +34,8 @@ namespace HotelListingAPI_MC.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetHotelDto>>> GetHotels()
         {
-            var hotels = await _hotelRepository.GetAllAsync();
-
-            var hotelsDto = _mapper.Map<List<GetHotelDto>>(hotels);
-
-            return Ok(hotelsDto);
+            var hotels = await _hotelRepository.GetAllAsync<GetHotelDto>();
+            return Ok(hotels);
         }
 
         // GET: api/Hotels/5

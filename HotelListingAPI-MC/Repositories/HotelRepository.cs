@@ -1,4 +1,5 @@
-﻿using HotelListingAPI_DATA;
+﻿using AutoMapper;
+using HotelListingAPI_DATA;
 using HotelListingAPI_MC.Contracts;
 using HotelListingAPI_MC.Data.Entities.HotelEntities;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace HotelListingAPI_MC.Repositories
 {
     public class HotelRepository : GenericRepository<HotelEntity>, IHotelRepository
     {
-        public HotelRepository(HotelListingDbContext dbContext) : base(dbContext)
+        public HotelRepository(HotelListingDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
             
         }

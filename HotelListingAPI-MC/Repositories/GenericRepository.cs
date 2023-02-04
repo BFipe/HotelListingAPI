@@ -1,5 +1,8 @@
-﻿using HotelListingAPI_DATA;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using HotelListingAPI_DATA;
 using HotelListingAPI_MC.Contracts;
+using HotelListingAPI_MC.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelListingAPI_MC.Repositories
@@ -7,10 +10,12 @@ namespace HotelListingAPI_MC.Repositories
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private protected readonly HotelListingDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public GenericRepository(HotelListingDbContext dbContext)
+        public GenericRepository(HotelListingDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public virtual async Task<T> AddAsync(T entity)
@@ -31,9 +36,11 @@ namespace HotelListingAPI_MC.Repositories
             await task;
         }
 
-        public virtual async Task<List<T>> GetAllAsync()
+        public virtual async Task<List<K>> GetAllAsync<K>()
         {
-            return await _dbContext.Set<T>().ToListAsync();
+            return await _dbContext.Set<T>()
+                .ProjectTo<K>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
         public virtual async Task<T> GetAsync(int id)
@@ -63,5 +70,24 @@ namespace HotelListingAPI_MC.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<PagedResult<K>> GetAllAsync<K>(QueryParameters queryParameters)
+        {
+            var totalSize = await _dbContext.Set<T>().CountAsync();
+
+            var items = await _dbContext.Set<T>()
+                .Skip(queryParameters.PageNumber * queryParameters.PageSize)
+                .Take(queryParameters.PageSize)
+                .ProjectTo<K>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+
+            return new PagedResult<K> 
+            {
+            Items = items,
+            PageNumber = queryParameters.PageNumber,
+            ItemsPerPage = queryParameters.PageSize,
+            TotalCount = totalSize
+            };
+        }
     }
 }

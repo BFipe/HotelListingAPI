@@ -12,12 +12,13 @@ using HotelListingAPI_MC.Models.Hotel;
 using HotelListingAPI_MC.Data.Entities.HotelEntities;
 using Microsoft.AspNetCore.Authorization;
 using HotelListingAPI_MC.Exceptions;
+using HotelListingAPI_MC.Models;
 
 namespace HotelListingAPI_MC.Controllers
 {
     [Route("api/v{version:apiVersion}/Hotels")]
     [ApiController]
-    [ApiVersion("1.1")]
+    [ApiVersion("2.0")]
 
     public class HotelsControllerV2 : ControllerBase
     {
@@ -30,15 +31,20 @@ namespace HotelListingAPI_MC.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Hotels
-        [HttpGet]
+        // GET: api/Hotels/GetAll
+        [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<GetHotelDto>>> GetHotels()
         {
-            var hotels = await _hotelRepository.GetAllAsync();
+            var hotels = await _hotelRepository.GetAllAsync<GetHotelDto>();
+            return Ok(hotels);
+        }
 
-            var hotelsDto = _mapper.Map<List<GetHotelDto>>(hotels);
-
-            return Ok(hotelsDto);
+        // GET: api/Hotels/?StartIndex=0&PageSize=25&PageNumber=1
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<GetHotelDto>>> GetHotels([FromQuery]QueryParameters parameters)
+        {
+            var hotels = await _hotelRepository.GetAllAsync<GetHotelDto>(parameters);
+            return Ok(hotels);
         }
 
         // GET: api/Hotels/5
