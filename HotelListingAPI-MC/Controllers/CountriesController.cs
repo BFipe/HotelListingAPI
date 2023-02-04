@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HotelListingAPI_DATA;
-using HotelListingAPI_MC.Models.Country;
+using HotelListingAPI_MC_Core.Models.Country;
 using AutoMapper;
-using HotelListingAPI_MC.Contracts;
-using HotelListingAPI_MC.Data.Entities.CountryEntities;
+using HotelListingAPI_MC_Core.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using HotelListingAPI_MC.Exceptions;
-using HotelListingAPI_MC.Models;
+using HotelListingAPI_MC_Core.Exceptions;
+using HotelListingAPI_MC_Core.Models;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -34,6 +28,8 @@ namespace HotelListingAPI_MC.Controllers
 
         // GET: api/Countries/GetAll
         [HttpGet("GetAll")]
+        [EnableQuery]
+
         public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
             var countries = await _countryRepository.GetAllAsync<GetCountryDto>();
@@ -43,6 +39,8 @@ namespace HotelListingAPI_MC.Controllers
 
         // GET: api/Countries/?StartIndex=0&PageSize=25&PageNumber=1
         [HttpGet]
+        [EnableQuery]
+
         public async Task<ActionResult<PagedResult<GetCountryDto>>> GetCountries([FromQuery] QueryParameters parameters)
         {
             var pagedCountries = await _countryRepository.GetAllAsync<GetCountryDto>(parameters);
@@ -53,14 +51,12 @@ namespace HotelListingAPI_MC.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryDto>> GetCountryEntity(int id)
         {
-            var countryEntity = await _countryRepository.GetAsync(id);
+            var countryDto = await _countryRepository.GetDtoAsync(id);
 
-            if (countryEntity == null)
+            if (countryDto == null)
             {
                 throw new NotFoundException(nameof(GetCountryEntity), id);
             }
-
-            var countryDto = _mapper.Map<CountryDto>(countryEntity);
 
             return Ok(countryDto);
         }
@@ -76,13 +72,7 @@ namespace HotelListingAPI_MC.Controllers
                 return BadRequest();
             }
 
-            var countryEntity = await _countryRepository.GetAsync(id);
-            if (countryEntity == null)
-            {
-                throw new NotFoundException(nameof(PutCountryEntity), id);
-            }
-
-            _mapper.Map(updateCountryDto, countryEntity);      
+            await _countryRepository.PutDtoCountryAsync(id, updateCountryDto);   
 
             try
             {
@@ -109,12 +99,10 @@ namespace HotelListingAPI_MC.Controllers
         [Authorize(Roles = "Manager, Admin")]
         public async Task<ActionResult<CreateCountryDto>> PostCountryEntity(CreateCountryDto createCountry)
         {
-            var country = _mapper.Map<CountryEntity>(createCountry);
-
-            await _countryRepository.AddAsync(country);
+            await _countryRepository.AddDtoAsync(createCountry);
             await _countryRepository.SaveChangesAsync();
 
-            return CreatedAtAction("GetCountryEntity", new { id = country.CountryId }, createCountry);
+            return Ok(createCountry);
         }
 
         // DELETE: api/Countries/5
@@ -122,15 +110,8 @@ namespace HotelListingAPI_MC.Controllers
         [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> DeleteCountryEntity(int id)
         {
-            var countryEntity = await _countryRepository.GetAsync(id);
-            if (countryEntity == null)
-            {
-                throw new NotFoundException(nameof(DeleteCountryEntity), id);
-            }
             await _countryRepository.DeleteAsync(id);
-
             await _countryRepository.SaveChangesAsync();
-
             return NoContent();
         }
 

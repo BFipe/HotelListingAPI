@@ -1,11 +1,8 @@
-using HotelListingAPI_DATA;
-using HotelListingAPI_MC.Configurations;
-using HotelListingAPI_MC.Contracts;
-using HotelListingAPI_MC.Middlewares;
-using HotelListingAPI_MC.Repositories;
+using HotelListingAPI_MC_Core;
+using HotelListingAPI_MC_Core.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OData;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
@@ -19,15 +16,12 @@ namespace HotelListingAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services.AddControllers();
-
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var connectionString = builder.Configuration["HotelListingDbConnectionString"];
-            builder.Services.AddDatabase(connectionString);
+            builder.Services.AddCoreExtentions(connectionString);
 
             //Configuring cors
             builder.Services.AddCors(options =>
@@ -42,17 +36,10 @@ namespace HotelListingAPI
 
             builder.Host.UseSerilog((ctx, lc) =>
             {
-                lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration);
-                lc.WriteTo.Seq("http://localhost:5341").ReadFrom.Configuration(ctx.Configuration);
+                lc.ReadFrom.Configuration(ctx.Configuration);
+                lc.WriteTo.Seq("http://localhost:5341");
+                lc.WriteTo.Console();
             });
-
-            builder.Services.AddAutoMapper(typeof(MapperConfig));
-
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            builder.Services.AddScoped<ICountryRepository, CountryRepository>();
-            builder.Services.AddScoped<IHotelRepository, HotelRepository>();
-            builder.Services.AddScoped<IAuthManager, AuthManager>();
-            builder.Services.AddTransient<ExceptionMiddleware>();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -64,14 +51,14 @@ namespace HotelListingAPI
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer= true,
-                    ValidateLifetime= true,
+                    ValidateIssuer = true,
+                    ValidateLifetime = true,
                     ValidateAudience = true,
                     ClockSkew = TimeSpan.Zero,
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtKey"]))
-                    
+
                 };
             });
 
@@ -100,6 +87,10 @@ namespace HotelListingAPI
                 options.UseCaseSensitivePaths = true;
             });
 
+            builder.Services.AddControllers().AddOData(options =>
+            {
+                options.Select().Filter().OrderBy();
+            });
 
             var app = builder.Build();
 
@@ -122,18 +113,18 @@ namespace HotelListingAPI
 
             app.UseResponseCaching();
 
-            app.Use(async (context, next) => 
+            app.Use(async (context, next) =>
             {
                 context.Response.GetTypedHeaders().CacheControl =
                 new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
                 {
                     Public = true,
-                    MaxAge = TimeSpan.FromSeconds(5),
+                    MaxAge = TimeSpan.FromSeconds(2),
                 };
 
                 context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
                     new string[] { "Accept-Encoding" };
-                
+
                 await next();
             });
 

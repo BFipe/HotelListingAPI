@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HotelListingAPI_DATA;
-using HotelListingAPI_MC.Contracts;
+using HotelListingAPI_MC_Core.Contracts;
 using AutoMapper;
-using HotelListingAPI_MC.Models.Hotel;
-using HotelListingAPI_MC.Data.Entities.HotelEntities;
+using HotelListingAPI_MC_Core.Models.Hotel;
+using HotelListingAPI_MC_Data.Entities.HotelEntities;
 using Microsoft.AspNetCore.Authorization;
-using HotelListingAPI_MC.Exceptions;
+using HotelListingAPI_MC_Core.Exceptions;
+using HotelListingAPI_MC_Core.Models;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace HotelListingAPI_MC.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/Hotels")]
     [ApiController]
-    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("1.0")]
 
     public class HotelsController : ControllerBase
     {
@@ -30,11 +26,21 @@ namespace HotelListingAPI_MC.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Hotels
-        [HttpGet]
+        // GET: api/Hotels/GetAll
+        [HttpGet("GetAll")]
+        [EnableQuery]
         public async Task<ActionResult<IEnumerable<GetHotelDto>>> GetHotels()
         {
             var hotels = await _hotelRepository.GetAllAsync<GetHotelDto>();
+            return Ok(hotels);
+        }
+
+        // GET: api/Hotels/?StartIndex=0&PageSize=25&PageNumber=1
+        [HttpGet]
+        [EnableQuery]
+        public async Task<ActionResult<PagedResult<GetHotelDto>>> GetHotels([FromQuery]QueryParameters parameters)
+        {
+            var hotels = await _hotelRepository.GetAllAsync<GetHotelDto>(parameters);
             return Ok(hotels);
         }
 
@@ -42,16 +48,14 @@ namespace HotelListingAPI_MC.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<HotelDto>> GetHotelEntity(int id)
         {
-            var hotelEntity = await _hotelRepository.GetAsync(id);
+            var hotelEntity = await _hotelRepository.GetAsync<HotelDto>(id);
 
             if (hotelEntity == null)
             {
                 throw new NotFoundException(nameof(GetHotelEntity), id);
             }
 
-            var hotelDto = _mapper.Map<HotelDto>(hotelEntity);
-
-            return Ok(hotelDto);
+            return Ok(hotelEntity);
         }
 
         // PUT: api/Hotels/5
