@@ -15,16 +15,16 @@ using HotelListingAPI_MC.Exceptions;
 
 namespace HotelListingAPI_MC.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v{version:apiVersion}/Hotels")]
     [ApiController]
-    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("1.1")]
 
-    public class HotelsController : ControllerBase
+    public class HotelsControllerV2 : ControllerBase
     {
         private readonly IHotelRepository _hotelRepository;
         private readonly IMapper _mapper;
 
-        public HotelsController(IHotelRepository hotelRepository, IMapper mapper)
+        public HotelsControllerV2(IHotelRepository hotelRepository, IMapper mapper)
         {
             _hotelRepository = hotelRepository;
             _mapper = mapper;
