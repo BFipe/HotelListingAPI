@@ -8,12 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HotelListing.Data\HotelListingAPI_MC_Data.csproj" />
+    <ProjectReference Include="..\HotelListingAPI_MC_Data\HotelListingAPI_MC_Data.csproj" />
   </ItemGroup>
 
 </Project>
