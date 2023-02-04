@@ -66,7 +66,13 @@ namespace HotelListingAPI_MC.Repositories
             try
             {
                 var jwtSequrityTokenHandler = new JwtSecurityTokenHandler();
+                if (jwtSequrityTokenHandler.CanReadToken(request.Token) == false)
+                {
+                    return null;
+                }
+
                 var tokenContent = jwtSequrityTokenHandler.ReadJwtToken(request.Token);
+
                 var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Sub)?.Value;
                 _user = await _userManager.FindByNameAsync(username);
                 if (_user is null || _user.Email != request.UserEmail)

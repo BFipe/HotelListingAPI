@@ -1,6 +1,7 @@
 using HotelListingAPI_DATA;
 using HotelListingAPI_MC.Configurations;
 using HotelListingAPI_MC.Contracts;
+using HotelListingAPI_MC.Middlewares;
 using HotelListingAPI_MC.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,7 @@ namespace HotelListingAPI
             builder.Host.UseSerilog((ctx, lc) =>
             {
                 lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration);
+                lc.WriteTo.Seq("http://localhost:5341").ReadFrom.Configuration(ctx.Configuration);
             });
 
             builder.Services.AddAutoMapper(typeof(MapperConfig));
@@ -49,6 +51,7 @@ namespace HotelListingAPI
             builder.Services.AddScoped<ICountryRepository, CountryRepository>();
             builder.Services.AddScoped<IHotelRepository, HotelRepository>();
             builder.Services.AddScoped<IAuthManager, AuthManager>();
+            builder.Services.AddTransient<ExceptionMiddleware>();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -80,11 +83,14 @@ namespace HotelListingAPI
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
 
             //Added serilog logging with settings in appsettings.json
             app.UseSerilogRequestLogging();
 
             app.UseHttpsRedirection();
+
+
 
             //Applying cors
             app.UseCors("AllowAll");

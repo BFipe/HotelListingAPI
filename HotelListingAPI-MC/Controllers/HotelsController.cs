@@ -11,6 +11,7 @@ using AutoMapper;
 using HotelListingAPI_MC.Models.Hotel;
 using HotelListingAPI_MC.Data.Entities.HotelEntities;
 using Microsoft.AspNetCore.Authorization;
+using HotelListingAPI_MC.Exceptions;
 
 namespace HotelListingAPI_MC.Controllers
 {
@@ -46,7 +47,7 @@ namespace HotelListingAPI_MC.Controllers
 
             if (hotelEntity == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(GetHotelEntity), id);
             }
 
             var hotelDto = _mapper.Map<HotelDto>(hotelEntity);
@@ -67,6 +68,11 @@ namespace HotelListingAPI_MC.Controllers
 
             var hotelEntity = await _hotelRepository.GetAsync(id);
 
+            if (hotelEntity == null)
+            {
+                throw new NotFoundException(nameof(PutHotelEntity), id);
+            }
+
             _mapper.Map(updateHotelDto, hotelEntity);
 
             try
@@ -77,7 +83,7 @@ namespace HotelListingAPI_MC.Controllers
             {
                 if (!await HotelEntityExists(id))
                 {
-                    return NotFound();
+                    throw new NotFoundException(nameof(PutHotelEntity), id);
                 }
                 else
                 {
@@ -98,7 +104,7 @@ namespace HotelListingAPI_MC.Controllers
 
             if (await _hotelRepository.IsCountryExist(createHotelDto.CountryId) == false)
             {
-                return NotFound();
+                    throw new NotFoundException(nameof(PostHotelEntity), createHotelDto.CountryId);
             }
 
             await _hotelRepository.AddAsync(hotelEntity);
@@ -115,7 +121,7 @@ namespace HotelListingAPI_MC.Controllers
             var hotelEntity = await _hotelRepository.GetAsync(id);
             if (hotelEntity == null)
             {
-                return NotFound();
+                throw new NotFoundException(nameof(DeleteHotelEntity), id);
             }
 
             await _hotelRepository.DeleteAsync(id);

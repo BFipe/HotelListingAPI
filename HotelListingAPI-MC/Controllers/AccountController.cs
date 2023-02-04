@@ -29,28 +29,23 @@ namespace HotelListingAPI_MC.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUserDto)
         {
             _logger.LogInformation($"Registration attempt for {registerUserDto.Email}");
-            try
-            {
-                var errors = await _authManager.Register(registerUserDto);
 
-                if (errors.Any())
-                {
-                    foreach (var error in errors)
-                    {
-                        ModelState.AddModelError(error.Code, error.Description);
-                    }
-                    return BadRequest(ModelState);
-                }
-                else
-                {
-                    return Ok();
-                }
-            }
-            catch (Exception ex)
+            var errors = await _authManager.Register(registerUserDto);
+
+            if (errors.Any())
             {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(Register)} when user {registerUserDto.Email} tried to register");
-                return Problem($"Something went wrong in the {nameof(Register)}", statusCode: 500);
+                foreach (var error in errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return BadRequest(ModelState);
             }
+            else
+            {
+                _logger.LogInformation($"Sucessfully registrated new user {registerUserDto.Email}");
+                return Ok();
+            }
+
         }
 
         // POST: api/Account/Login
@@ -61,24 +56,18 @@ namespace HotelListingAPI_MC.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
         {
-            _logger.LogInformation($"Registration attempt for {loginUserDto.Email}");
-            try
+            _logger.LogInformation($"Login attempt for {loginUserDto.Email}");
+
+            var result = await _authManager.Login(loginUserDto);
+            if (result is null)
             {
-                var result = await _authManager.Login(loginUserDto);
-                if (result is null)
-                {
-                    return Unauthorized();
-                }
-                else
-                {
-                    return Ok(result);
-                }
+                return Unauthorized();
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(Login)} when user {loginUserDto.Email} tried to login");
-                return Problem($"Something went wrong in the {nameof(Login)}", statusCode: 500);
+                return Ok(result);
             }
+
         }
 
 
@@ -91,23 +80,18 @@ namespace HotelListingAPI_MC.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] AuthResponceDto request)
         {
             _logger.LogInformation($"Refreshing token attempt for {request.UserEmail}");
-            try
+
+            var result = await _authManager.VerifyRefreshToken(request);
+            if (result is null)
             {
-                var result = await _authManager.VerifyRefreshToken(request);
-                if (result is null)
-                {
-                    return Unauthorized();
-                }
-                else
-                {
-                    return Ok(result);
-                }
+                return Unauthorized();
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, $"Something went wrong in the {nameof(RefreshToken)} when updating refresh token for {request.UserEmail}");
-                return Problem($"Something went wrong in the {nameof(RefreshToken)}", statusCode: 500);
+                return Ok(result);
             }
+
+
         }
     }
 }
