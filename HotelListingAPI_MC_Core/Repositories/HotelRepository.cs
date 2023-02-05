@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelListingAPI_MC_Core.Contracts;
+using HotelListingAPI_MC_Core.Exceptions;
 using HotelListingAPI_MC_Core.Models.Hotel;
 using HotelListingAPI_MC_Data;
 using HotelListingAPI_MC_Data.Entities.HotelEntities;
@@ -22,6 +23,18 @@ namespace HotelListingAPI_MC_Core.Repositories
         public async Task<bool> IsCountryExist(int id)
         {
             return await _dbContext.Countries.SingleOrDefaultAsync(q => q.CountryId == id) is not null;
+        }
+
+        public async Task PutDtoHotel(int id, UpdateHotelDto updateHotelDto)
+        {
+            var hotelEntity = await GetAsync(id);
+
+            if (hotelEntity == null)
+            {
+                throw new NotFoundException(nameof(PutDtoHotel), id);
+            }
+
+            _mapper.Map(updateHotelDto, hotelEntity);
         }
     }
 }

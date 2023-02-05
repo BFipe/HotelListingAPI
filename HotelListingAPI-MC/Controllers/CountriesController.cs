@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HotelListingAPI_MC_Core.Models.Country;
-using AutoMapper;
+﻿using AutoMapper;
 using HotelListingAPI_MC_Core.Contracts;
-using Microsoft.AspNetCore.Authorization;
 using HotelListingAPI_MC_Core.Exceptions;
 using HotelListingAPI_MC_Core.Models;
+using HotelListingAPI_MC_Core.Models.Country;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
 namespace HotelListingAPI_MC.Controllers
@@ -33,8 +32,7 @@ namespace HotelListingAPI_MC.Controllers
         public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
         {
             var countries = await _countryRepository.GetAllAsync<GetCountryDto>();
-            var dtoCountries = _mapper.Map<IEnumerable<GetCountryDto>>(countries);
-            return Ok(dtoCountries);
+            return Ok(countries);
         }
 
         // GET: api/Countries/?StartIndex=0&PageSize=25&PageNumber=1
@@ -64,7 +62,7 @@ namespace HotelListingAPI_MC.Controllers
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles ="Manager, Admin")]
+        [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> PutCountryEntity(int id, UpdateCountryDto updateCountryDto)
         {
             if (id != updateCountryDto.CountryId)
@@ -72,23 +70,8 @@ namespace HotelListingAPI_MC.Controllers
                 return BadRequest();
             }
 
-            await _countryRepository.PutDtoCountryAsync(id, updateCountryDto);   
-
-            try
-            {
-                await _countryRepository.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await CountryEntityExists(id))
-                {
-                    throw new NotFoundException(nameof(PutCountryEntity), id);
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _countryRepository.PutDtoCountryAsync(id, updateCountryDto);
+            await _countryRepository.SaveChangesAsync();
 
             return NoContent();
         }
@@ -112,6 +95,7 @@ namespace HotelListingAPI_MC.Controllers
         {
             await _countryRepository.DeleteAsync(id);
             await _countryRepository.SaveChangesAsync();
+
             return NoContent();
         }
 

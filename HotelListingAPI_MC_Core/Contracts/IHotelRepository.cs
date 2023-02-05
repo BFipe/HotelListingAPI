@@ -5,6 +5,7 @@ namespace HotelListingAPI_MC_Core.Contracts
 {
     public interface IHotelRepository : IGenericRepository<HotelEntity>
     {
+        public Task PutDtoHotel(int id, UpdateHotelDto updateHotelDto);
         public Task<bool> IsCountryExist(int id);
         public Task<HotelDto> GetDtoAsync(int id);
     }

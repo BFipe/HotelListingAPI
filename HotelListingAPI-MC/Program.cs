@@ -1,9 +1,12 @@
 using HotelListingAPI_MC_Core;
 using HotelListingAPI_MC_Core.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.OData;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
 
@@ -18,7 +21,42 @@ namespace HotelListingAPI
             // Add services to the container.
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Hotel listing Api",
+                    Version = "v1",
+                });
+
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+                {
+                    Description = "Inser your token with the word [Bearer] like this: \"Bearer your0unique0token032h3t4g87...\" ",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme
+                            },
+                            Scheme = "0auth2",
+                            Name = JwtBearerDefaults.AuthenticationScheme,
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>()
+                    }
+                });
+            });
 
             var connectionString = builder.Configuration["HotelListingDbConnectionString"];
             builder.Services.AddCoreExtentions(connectionString);
@@ -87,6 +125,8 @@ namespace HotelListingAPI
                 options.UseCaseSensitivePaths = true;
             });
 
+            builder.Services.AddHealthChecks();
+
             builder.Services.AddControllers().AddOData(options =>
             {
                 options.Select().Filter().OrderBy();
@@ -94,12 +134,12 @@ namespace HotelListingAPI
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI();
+
+            app.MapHealthChecks("/HealthCheck");
 
             app.UseMiddleware<ExceptionMiddleware>();
 

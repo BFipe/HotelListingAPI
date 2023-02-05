@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using HotelListingAPI_MC_Core.Contracts;
 using AutoMapper;
 using HotelListingAPI_MC_Core.Models.Hotel;
@@ -69,31 +68,10 @@ namespace HotelListingAPI_MC.Controllers
                 return BadRequest();
             }
 
-            var hotelEntity = await _hotelRepository.GetAsync(id);
+            await _hotelRepository.PutDtoHotel(id, updateHotelDto);
 
-            if (hotelEntity == null)
-            {
-                throw new NotFoundException(nameof(PutHotelEntity), id);
-            }
-
-            _mapper.Map(updateHotelDto, hotelEntity);
-
-            try
-            {
-                await _hotelRepository.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await HotelEntityExists(id))
-                {
-                    throw new NotFoundException(nameof(PutHotelEntity), id);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            await _hotelRepository.SaveChangesAsync();
+         
             return NoContent();
         }
 
